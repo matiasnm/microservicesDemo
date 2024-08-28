@@ -1,0 +1,37 @@
+server:
+  port: 8081
+  forward-headers-strategy: framework
+spring:
+  application:
+    name: product
+  data:
+    mongodb:
+      uri: 'mongodb+srv://matiasnm:6FMCeA2peEMS8ryY@productscluster.ci28kfu.mongodb.net/?retryWrites=true&w=majority&appName=ProductsCluster'
+      database: products
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api/api-docs
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        minimum-number-of-calls: 5
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 2s
