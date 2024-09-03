@@ -1,0 +1,23 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: notification
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: a0bfaebff99206
+    password: 34e76751052ccd
+    protocol: smtp
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notificationService
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      #ErrorHandlingDeserializer ?
+      properties:
+        spring:
+          json:
+            type:
+              mapping: event:com.microservices.order.event.OrderPlacedEvent
