@@ -4,7 +4,7 @@ import com.microservices.order.client.InventoryClient;
 import com.microservices.order.dto.OrderRequestDto;
 import com.microservices.order.dto.OrderResponseDto;
 import com.microservices.order.entity.Order;
-import com.microservices.order.event.OrderPlaceEvent;
+import com.microservices.order.event.OrderPlacedEvent;
 import com.microservices.order.mapper.*;
 import com.microservices.order.repository.OrderRepository;
 import com.microservices.order.exception.FallbackException;
@@ -29,7 +29,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final OrderResponseDtoMapper responseMapper;
     private final InventoryClient inventoryClient;
-    private final KafkaTemplate<String, OrderPlaceEvent> kafkaTemplate;
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     private boolean checkStock(OrderRequestDto request) {
         try {
@@ -46,12 +46,15 @@ public class OrderService {
         if (checkStock(request)) {
             Order order = orderMapper.apply(request);
             Order savedOrder = repository.save(order);
+            // chec quantity != 0
+            // exception if productNotfound on inventory???
             // send msg to Kafka topic
+            // if kafka not responding?? order is not placed, excp?
             String orderId = savedOrder.getId().toString();
-            OrderPlaceEvent event = new OrderPlaceEvent(orderId, request.product_id());
-            log.info("START: sending 'OrderPlacedEvent {}' to Kafka topic ORDER PLACED");
-            kafkaTemplate.send("ORER PLACED:", event);
-            log.info("END: sending 'OrderPlacedEvent {}' to Kafka topic ORDER PLACED");
+            OrderPlacedEvent event = new OrderPlacedEvent(orderId, request.userDetails().email());
+            log.info("START: sending 'OrderPlacedEvent {}' to Kafka topic 'order-placed'");
+            kafkaTemplate.send("order-placed", event);
+            log.info("END: sending 'OrderPlacedEvent {}' to Kafka topic 'order-placed'");
 
             return orderId;
         } else {
