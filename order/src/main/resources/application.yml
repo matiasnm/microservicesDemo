@@ -55,3 +55,21 @@ logging:
     org:
       springframework:
         web: DEBUG
+# Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: order
+  tracing:
+    sampling:
+      probability: 1.0

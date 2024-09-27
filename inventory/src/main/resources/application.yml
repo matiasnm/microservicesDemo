@@ -39,3 +39,21 @@ resilience4j:
       default:
         max-attempts: 3
         wait-duration: 2s
+# Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: inventory
+  tracing:
+    sampling:
+      probability: 1.0
